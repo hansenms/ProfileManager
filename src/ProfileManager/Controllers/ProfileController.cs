@@ -27,7 +27,7 @@ namespace ProfileManager.Controllers
         }
 
         [HttpGet("{id}", Name = "GetProfile")]
-        public ActionResult<Profile> GetById(int id)
+        public ActionResult<Profile> GetById(long id)
         {
             var profile = _context.Profiles.Find(id);
             if (profile == null)
@@ -35,6 +35,34 @@ namespace ProfileManager.Controllers
                 return NotFound();
             }
             return profile;
+        }
+
+        [HttpPost]
+        public IActionResult Create(Profile profile)
+        {
+            _context.Profiles.Add(profile);
+            _context.SaveChanges();
+
+            return CreatedAtRoute("GetProfile", new { id = profile.Id }, profile);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(long id, Profile updatedProfile)
+        {
+            var profile = _context.Profiles.Find(id);
+            if (profile == null)
+            {
+                return NotFound();
+            }
+
+            profile.FirstName = updatedProfile.FirstName;
+            profile.LastName = updatedProfile.LastName;
+            profile.Department = updatedProfile.Department;
+            profile.Photo = updatedProfile.Photo;
+
+            _context.Profiles.Update(profile);
+            _context.SaveChanges();
+            return NoContent(); 
         }
     }
 }
