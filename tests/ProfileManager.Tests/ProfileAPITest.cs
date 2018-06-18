@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Net;
 
 namespace ProfileManager.Tests
 {
@@ -66,6 +67,7 @@ namespace ProfileManager.Tests
 
         [Theory]
         [InlineData("/api/profile")]
+        [InlineData("/api/profile/1")]
         public async Task Get_EndpointsReturnSuccessAndCorrectContentType(string url)
         {
             // Arrange
@@ -80,5 +82,18 @@ namespace ProfileManager.Tests
                 response.Content.Headers.ContentType.ToString());
         }
 
+        [Fact]
+        public async Task Get_GetByIdReturnsNotFoundWhenProfileDoesntExit()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            string url = "/api/profile/1000";
+
+            // Act
+            var response = await client.GetAsync(url);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
     }
 }
