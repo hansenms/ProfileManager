@@ -16,9 +16,9 @@ namespace ProfileManager.Data
             }
 
             var profiles = new Profile[] {
-                new Profile{ ProfileId = 1, FirstName = "Abby", LastName = "Addision", Department = "Accounting", Photo = "abby.jpg"},
-                new Profile{ ProfileId = 2, FirstName = "Bob", LastName = "Beumont", Department = "Business Desk", Photo = "bob.jpg"},
-                new Profile{ ProfileId = 3, FirstName = "Chris", LastName = "Christianson", Department = "Communications", Photo = "chris.jpg"}
+                new Profile{ FirstName = "Abby", LastName = "Addision", Department = "Accounting", Photo = "abby.jpg"},
+                new Profile{ FirstName = "Bob", LastName = "Beumont", Department = "Business Desk", Photo = "bob.jpg"},
+                new Profile{ FirstName = "Chris", LastName = "Christianson", Department = "Communications", Photo = "chris.jpg"}
             };
 
             foreach (Profile p in profiles)

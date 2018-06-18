@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Net;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace ProfileManager.Tests
 {
@@ -95,5 +97,73 @@ namespace ProfileManager.Tests
             // Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
+
+        [Fact]
+        public async Task Get_CreateReturns201()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            string url = "/api/profile";
+
+            var requestData = new { firtName = "TestFirstName",
+                                    lastName = "TestLastName",
+                                    department = "TestDepartment",
+                                    photo = "TestPhoto.jpg" };
+
+
+            var content = new StringContent(JsonConvert.SerializeObject(requestData), Encoding.UTF8, "application/json");
+
+            // Act
+            var response = await client.PostAsync(url, content);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        }
+
+
+        [Fact]
+        public async Task Get_UpdateReturns204WhenProfileExists()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            string url = "/api/profile/1";
+
+            var requestData = new { firtName = "TestFirstName",
+                                    lastName = "TestLastName",
+                                    department = "TestDepartment",
+                                    photo = "TestPhoto.jpg" };
+
+
+            var content = new StringContent(JsonConvert.SerializeObject(requestData), Encoding.UTF8, "application/json");
+
+            // Act
+            var response = await client.PutAsync(url, content);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Get_UpdateReturns404WhenProfileDoesntExists()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            string url = "/api/profile/1000";
+
+            var requestData = new { firtName = "TestFirstName",
+                                    lastName = "TestLastName",
+                                    department = "TestDepartment",
+                                    photo = "TestPhoto.jpg" };
+
+
+            var content = new StringContent(JsonConvert.SerializeObject(requestData), Encoding.UTF8, "application/json");
+
+            // Act
+            var response = await client.PutAsync(url, content);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
     }
 }
