@@ -10,6 +10,7 @@ using ProfileManager.Models;
 namespace ProfileManager.Controllers
 {
     [Route("api/[controller]")]
+    [ApiController]
     public class ProfileController : Controller
     {
         private readonly ProfileContext _context;
@@ -20,9 +21,20 @@ namespace ProfileManager.Controllers
         }
 
         [HttpGet]
-        public List<Profile> GetAll()
+        public ActionResult<List<Profile>> GetAll()
         {
             return _context.Profiles.ToList();
+        }
+
+        [HttpGet("{id}", Name = "GetProfile")]
+        public ActionResult<Profile> GetById(int id)
+        {
+            var profile = _context.Profiles.Find(id);
+            if (profile == null)
+            {
+                return NotFound();
+            }
+            return profile;
         }
     }
 }
