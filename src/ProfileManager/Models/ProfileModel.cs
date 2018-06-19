@@ -11,17 +11,4 @@ namespace ProfileManager.Models
         public string Department { get; set; }
         public string Photo { get; set; }
     }
-
-    public class ProfileDbContext : DbContext
-    {
-        public ProfileDbContext(DbContextOptions<ProfileDbContext> options) : base(options) 
-        {
-
-        }
-
-        public DbSet<Profile> Profiles { get; set; }
-
-
-    } 
-
 }

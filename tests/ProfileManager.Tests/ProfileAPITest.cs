@@ -14,44 +14,6 @@ using System.Text;
 
 namespace ProfileManager.Tests
 {
-    public class CustomWebApplicationFactory<TStartup>
-        : WebApplicationFactory<ProfileManager.Startup>
-    {
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
-        {
-            builder.ConfigureServices(services =>
-            {
-                // Create a new service provider.
-                var serviceProvider = new ServiceCollection()
-                        .AddEntityFrameworkInMemoryDatabase()
-                        .BuildServiceProvider();
-
-                // Add a database context (ProfileDbContext) using an in-memory 
-                // database for testing.
-                services.AddDbContext<ProfileContext>(options =>
-                    {
-                        options.UseInMemoryDatabase("ProfileDbForTesting");
-                        options.UseInternalServiceProvider(serviceProvider);
-                    });
-
-                // Build the service provider.
-                var sp = services.BuildServiceProvider();
-
-                // Create a scope to obtain a reference to the database
-                // context (ApplicationDbContext).
-                using (var scope = sp.CreateScope())
-                {
-                    var scopedServices = scope.ServiceProvider;
-                    var context = scopedServices.GetRequiredService<ProfileContext>();
-                    var logger = scopedServices
-                        .GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
-
-                    ProfileDbInitializer.Initialize(context);
-                }
-            });
-        }
-    }
-
     public class ProfileAPITest
         : IClassFixture<CustomWebApplicationFactory<ProfileManager.Startup>>
     {
@@ -99,7 +61,7 @@ namespace ProfileManager.Tests
         }
 
         [Fact]
-        public async Task Get_CreateReturns201()
+        public async Task Post_CreateReturns201()
         {
             // Arrange
             var client = _factory.CreateClient();
@@ -122,7 +84,7 @@ namespace ProfileManager.Tests
 
 
         [Fact]
-        public async Task Get_UpdateReturns204WhenProfileExists()
+        public async Task Update_Returns204WhenProfileExists()
         {
             // Arrange
             var client = _factory.CreateClient();
@@ -133,18 +95,15 @@ namespace ProfileManager.Tests
                                     department = "TestDepartment",
                                     photo = "TestPhoto.jpg" };
 
-
-            var content = new StringContent(JsonConvert.SerializeObject(requestData), Encoding.UTF8, "application/json");
-
             // Act
-            var response = await client.PutAsync(url, content);
+            var response = await client.PutAsJsonAsync(url, requestData);
 
             // Assert
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
 
         [Fact]
-        public async Task Get_UpdateReturns404WhenProfileDoesntExists()
+        public async Task Update_Returns404WhenProfileDoesntExists()
         {
             // Arrange
             var client = _factory.CreateClient();
@@ -156,14 +115,42 @@ namespace ProfileManager.Tests
                                     photo = "TestPhoto.jpg" };
 
 
-            var content = new StringContent(JsonConvert.SerializeObject(requestData), Encoding.UTF8, "application/json");
-
             // Act
-            var response = await client.PutAsync(url, content);
+            var response = await client.PutAsJsonAsync(url, requestData);
 
             // Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
+
+        [Fact]
+        public async Task Delete_Returns204WhenProfileExists()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            string url = "/api/profile/1";
+
+
+            // Act
+            var response = await client.DeleteAsync(url);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Delete_Returns404WhenProfileDoesntExist()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            string url = "/api/profile/1000";
+
+            // Act
+            var response = await client.DeleteAsync(url);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
 
     }
 }
