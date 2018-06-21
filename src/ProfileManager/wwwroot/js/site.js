@@ -18,7 +18,7 @@ function submitUploadedImage()
         data: formData,
         mimeType: "multipart/form-data",
         success: function (data) {
-            document.getElementById('Edit').submit();
+            //
         },
         cache: false,
         contentType: false,
@@ -28,9 +28,30 @@ function submitUploadedImage()
     return false;
 }
 
-function paintFaceRectangle(top, left, width, height) {
+function setAlertField(messageText, alertType)
+{
+    var alertField = document.getElementById('feedback');
 
-    var box = document.getElementById('faceRectangle');
+    alertField.innerHTML = messageText;
+    alertField.className = "alert alert-" + alertType;
+    alertField.style.visibility = "visible";
+}
+
+function hideAlertField()
+{
+    var alertField = document.getElementById('feedback');
+    alertField.style.visibility = "hidden";
+}
+
+function paintFaceRectangle(top, left, width, height, color) {
+
+    var wrapper = document.getElementById('image-wrapper'); 
+    var box = document.createElement('div');
+    box.className = "box";
+    box.style.border = "2px solid " + color;
+
+    wrapper.appendChild(box);
+
     var img = document.getElementById('outImage');
 
     var scale = img.width / img.naturalWidth;
@@ -40,6 +61,16 @@ function paintFaceRectangle(top, left, width, height) {
     box.style.width = Math.round(width * scale).toString() + "px";
     box.style.height = Math.round(height * scale).toString() + "px";
     box.style.visibility = "visible";
+}
+
+function clearFaceRectangles()
+{
+    var wrapper = document.getElementById('image-wrapper'); 
+    var div = wrapper.getElementsByTagName('div');
+    while (div.length) {
+        wrapper.removeChild(div[0]);
+        var div = wrapper.getElementsByTagName('div');
+    }
 }
 
 function loadProfileImageFromFile(evt) {
@@ -55,6 +86,8 @@ function loadProfileImageFromFile(evt) {
         "returnFaceId": "true"
     };
 
+    clearFaceRectangles();
+    setAlertField("Analyzing image...", "light");
     // FileReader support
     if (FileReader && files && files.length) {
         var fr = new FileReader();
@@ -74,14 +107,22 @@ function loadProfileImageFromFile(evt) {
                 data: files[0],
             })
                 .done(function (data) {
-                    var rect = data[0].faceRectangle;
+                    var rect;
                     if (data.length == 1) {
-                        submitUploadedImage() 
+                        submitUploadedImage()
+                        rect = data[0].faceRectangle; 
+                        paintFaceRectangle(rect.top, rect.left, rect.width, rect.height, "#2cfa02");
+                        setAlertField("Image Uploaded. Hit Save to confirm", "success");
                     } else {
-                        alert('Invalid image. Number of faces: ' +  data.length.toString());
+                        var f;
+                        for (f = 0; f < data.length; f++) {
+                            rect = data[f].faceRectangle;
+                            paintFaceRectangle(rect.top, rect.left, rect.width, rect.height, "#fa0202");
+                        }
+                        setAlertField("Invalid number of faces in image: " + data.length.toString(), "danger");
+                        //alert('Invalid image. Number of faces: ' +  data.length.toString());
                     }
 
-                    paintFaceRectangle(rect.top, rect.left, rect.width, rect.height);
                 })
                 .fail(function (jqXHR, textStatus, errorThrown) {
                     // Display error message.

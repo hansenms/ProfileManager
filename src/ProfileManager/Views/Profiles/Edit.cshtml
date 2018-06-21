@@ -41,9 +41,11 @@
     </div>
 </div>
     <div>
-        <div class="wrapper">
+        <div class="wrapper" id="image-wrapper">
             <img id="outImage" width="200" src="@initialImageName" alt="ImageNotFound" />
+            <!--
             <div id="faceRectangle" class="box"></div>
+            -->
         </div>
         <div class="form-group">
             <form id="image-upload-form" enctype="multipart/form-data">
@@ -51,7 +53,8 @@
                     <input type="file" id="file"/>
                 </label>
             </form>
-        </div>    
+        </div>  
+        <div class="alert alert-success" role="alert" id="feedback" style="visibility: hidden;"></div>  
     </div>
 <div>
     <a asp-action="Index">Back to List</a>
@@ -71,7 +74,7 @@
         left:0px;
         width:50px;
         height:50px;
-        border:2px solid #c00606;
+        border:2px solid #fa0202;
         background-color:transparent;
         visibility: hidden;
     }
