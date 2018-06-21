@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Edit";
+    var initialImageName = "/api/profile/image/" + Model.Photo;
 }
 
 <h2>Edit</h2>
@@ -39,6 +40,21 @@
         </form>
     </div>
 </div>
+    <div>
+        <div class="wrapper">
+            <img id="outImage" width="200" src="@initialImageName" alt="ImageNotFound" />
+            <div id="faceRectangle" class="box"></div>
+        </div>
+            <form>
+                <input type="file" id="picField"/>
+            </form>
+    </div>
+    <div id="jsonOutput" style="width:600px; display:table-cell;">
+        Response:<br><br>
+
+        <textarea id="responseTextArea" class="UIInput"
+                  style="width:580px; height:400px;"></textarea>
+    </div>
 
 <div>
     <a asp-action="Index">Back to List</a>
@@ -46,4 +62,123 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <style>
+    .wrapper {
+        position:relative;
+    }
+
+    .box {
+        position:absolute;
+        top:0px;
+        left:0px;
+        width:50px;
+        height:50px;
+        border:2px solid #c00606;
+        background-color:transparent
+    }
+    </style>
+
+   <script lang="JavaScript">
+        function getImageScale(imageId)
+        {
+            var img = document.getElementById(imageId);
+            var scale = img.width / img.naturalWidth;
+            return scale;
+        }
+
+        function paintFaceRectangle(top, left, width, height) {
+
+            var box = document.getElementById('faceRectangle');
+            var img = document.getElementById('outImage');
+
+            var scale = img.width / img.naturalWidth;
+
+            box.style.top = Math.round(top * scale).toString() + "px";
+            box.style.left = Math.round(left * scale).toString() + "px";
+            box.style.width = Math.round(width * scale).toString() + "px";
+            box.style.height = Math.round(height * scale).toString() + "px";
+        }
+
+        document.getElementById('outImage').onload = function () {
+            alert(getImageScale('outImage'));
+        }
+
+        document.getElementById('picField').onchange = function (evt) {
+            var tgt = evt.target || window.event.srcElement,
+                files = tgt.files;
+
+
+        var uriBase =
+            "/api/profile/image/face/detect";
+
+        // Request parameters.
+        var params = {
+            "returnFaceId": "true",
+            "returnFaceLandmarks": "false",
+            "returnFaceAttributes":
+                "age,gender,headPose,smile,facialHair,glasses,emotion," +
+                "hair,makeup,occlusion,accessories,blur,exposure,noise"
+        };    
+        
+            // FileReader support
+            if (FileReader && files && files.length) {
+                var fr = new FileReader();
+                fr.onload = function () {
+                    
+            $.ajax({
+            url: uriBase + "?" + $.param(params),
+
+            // Request headers.
+            beforeSend: function(xhrObj){
+                xhrObj.setRequestHeader("Content-Type","application/octet-stream");
+            },
+            type: "POST",
+            processData: false,
+
+            // Request body.
+            data: files[0],
+            })
+            
+        .done(function(data) {
+            // Show formatted JSON on webpage.
+            $("#responseTextArea").val(JSON.stringify(data[0].faceRectangle, null, 2));
+            var rect = data[0].faceRectangle;
+            paintFaceRectangle(rect.top, rect.left, rect.width, rect.height);
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            // Display error message.
+            var errorString = (errorThrown === "") ?
+                "Error. " : errorThrown + " (" + jqXHR.status + "): ";
+            errorString += (jqXHR.responseText === "") ?
+                "" : (jQuery.parseJSON(jqXHR.responseText).message) ?
+                    jQuery.parseJSON(jqXHR.responseText).message :
+                        jQuery.parseJSON(jqXHR.responseText).error.message;
+            alert(errorString);
+        });
+
+                    document.getElementById('outImage').src = fr.result;
+                    alert(getImageScale('outImage'));
+                    document.getElementById('Photo').value = document.getElementById('Id').value + '/' + files[0].name;
+                }
+                fr.readAsDataURL(files[0]);
+            }
+        
+            // Not supported
+            else {
+                Console.log("FileReader not supported")
+                // fallback -- perhaps submit the input to an iframe and temporarily store
+                // them on the server until the user's session ends.
+            }
+        }
+
+        function attachEvents() {
+            var picfield = document.getElementById('picField');
+            if (picField.attachEvent) {
+                picField.attachEvent("change", processImage);
+            } else {
+                picField.addEventListener("change", processImage);
+            }
+        }
+    </script>
 }
