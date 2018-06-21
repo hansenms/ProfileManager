@@ -14,6 +14,7 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Photo" />
             <div class="form-group">
                 <label asp-for="FirstName" class="control-label"></label>
                 <input asp-for="FirstName" class="form-control" />
@@ -30,12 +31,7 @@
                 <span asp-validation-for="Department" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Photo" class="control-label"></label>
-                <input asp-for="Photo" class="form-control" />
-                <span asp-validation-for="Photo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input id="edit-submit" type="submit" value="Save" class="btn btn-default" />
             </div>
         </form>
     </div>
@@ -49,9 +45,7 @@
         </div>
         <div class="form-group">
             <form id="image-upload-form" enctype="multipart/form-data">
-                <label class="btn btn-default">
-                    <input type="file" id="file"/>
-                </label>
+                <input style="width: 200px;" class="form-control" type="file" id="file"/>
             </form>
         </div>  
         <div class="alert alert-success" role="alert" id="feedback" style="visibility: hidden;"></div>  

@@ -43,6 +43,16 @@ function hideAlertField()
     alertField.style.visibility = "hidden";
 }
 
+function disableSubmitButton()
+{
+    document.getElementById('edit-submit').disabled = true;
+}
+
+function enableSubmitButton()
+{
+    document.getElementById('edit-submit').disabled = false;
+}
+
 function paintFaceRectangle(top, left, width, height, color) {
 
     var wrapper = document.getElementById('image-wrapper'); 
@@ -87,6 +97,7 @@ function loadProfileImageFromFile(evt) {
     };
 
     clearFaceRectangles();
+    disableSubmitButton();
     setAlertField("Analyzing image...", "light");
     // FileReader support
     if (FileReader && files && files.length) {
@@ -113,6 +124,7 @@ function loadProfileImageFromFile(evt) {
                         rect = data[0].faceRectangle; 
                         paintFaceRectangle(rect.top, rect.left, rect.width, rect.height, "#2cfa02");
                         setAlertField("Image Uploaded. Hit Save to confirm", "success");
+                        enableSubmitButton();
                     } else {
                         var f;
                         for (f = 0; f < data.length; f++) {
