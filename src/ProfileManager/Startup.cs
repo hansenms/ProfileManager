@@ -24,7 +24,7 @@ namespace ProfileManager
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ProfileContext>(options => options.UseInMemoryDatabase("ProfileTest"));
+            services.AddDbContext<ProfileContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SqlDbConnectionString")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
