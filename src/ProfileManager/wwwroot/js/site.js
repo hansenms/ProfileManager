@@ -188,13 +188,6 @@ function loadNewProfileImageFromFile(evt) {
         }
         fr.readAsDataURL(files[0]);
     }
-
-    // Not supported
-    else {
-        Console.log("FileReader not supported")
-        // fallback -- perhaps submit the input to an iframe and temporarily store
-        // them on the server until the user's session ends.
-    }
 }
 
 
@@ -211,7 +204,6 @@ function loadVerificationProfileImageFromFile(evt) {
     };
 
     clearFaceRectangles();
-    //disableSubmitButton();
     setAlertField("Analyzing image...", "light");
     // FileReader support
     if (FileReader && files && files.length) {
@@ -234,24 +226,9 @@ function loadVerificationProfileImageFromFile(evt) {
                 .done(function (data) {
                     var rect;
                     if (data.length > 0) {
-                        //submitUploadedImage()
                         verifyFaces(data);
-                        /*
-                        rect = data[0].faceRectangle; 
-                        paintFaceRectangle(rect.top, rect.left, rect.width, rect.height, "#2cfa02");
-                        setAlertField("Image Uploaded. Hit Save to confirm", "success");
-                        */
-                        //enableSubmitButton();
                     } else {
-                        /*
-                        var f;
-                        for (f = 0; f < data.length; f++) {
-                            rect = data[f].faceRectangle;
-                            paintFaceRectangle(rect.top, rect.left, rect.width, rect.height, "#fa0202");
-                        }
-                        */
                         setAlertField("No faces detected in validation image.", "danger");
-                        //alert('Invalid image. Number of faces: ' +  data.length.toString());
                     }
 
                 })
@@ -269,13 +246,6 @@ function loadVerificationProfileImageFromFile(evt) {
             document.getElementById('outImage').src = fr.result;
         }
         fr.readAsDataURL(files[0]);
-    }
-
-    // Not supported
-    else {
-        Console.log("FileReader not supported")
-        // fallback -- perhaps submit the input to an iframe and temporarily store
-        // them on the server until the user's session ends.
     }
 }
 
@@ -298,11 +268,11 @@ function verifyFaces(testFaces)
                 imgData, 
                 function (data) {
                     var fref = data[0].faceId;
-                    var matchFound = false;
-                    var f;
-                    for (f = 0; f < testFaces.length; f++) {
-                        var compObject = { faceId1: fref, faceId2: testFaces[f].faceId};
-                        alert(JSON.stringify(compObject));
+                    var facesChecked = 0;
+                    var matchesFound = 0;
+                    for (let f = 0; f < testFaces.length; f++) {
+                        let compObject = { faceId1: fref, faceId2: testFaces[f].faceId};
+                        let rect = testFaces[f].faceRectangle;
                         $.ajax({
                             url: '/api/profile/image/face/verify',
                             beforeSend: function (xhrObj) {
@@ -311,18 +281,25 @@ function verifyFaces(testFaces)
                             data: JSON.stringify(compObject),
                             type: 'POST',
                             success: function (data) {
+                                //The incrementing of valus here is to ensure that all the
+                                //Asyncronous HTTP requests complete before we update the status.
                                 if (data.isIdentical) {
-                                    matchFound = true;
-                                    setAlertField("Match found, confidence: " + data.confidence, "success");
+                                    matchesFound++;
+                                    paintFaceRectangle(rect.top, rect.left, rect.width, rect.height, "#2cfa02");
+                                } else {
+                                    paintFaceRectangle(rect.top, rect.left, rect.width, rect.height, "#fa0202");
+                                }
+                                facesChecked++;
+                                if (facesChecked >= testFaces.length) {
+                                    if (matchesFound > 0) {
+                                        setAlertField("Matches found: " + matchesFound, "success");
+                                    } else {
+                                        setAlertField("No matches found", "danger");
+                                    }
                                 }
                             },
                         })
-                        alert('Comparing face: ' + fref + ", " + testFaces[f].faceId);
-                        console.log("{ 'faceId1': '" + fref + "', 'faceId2': '" + testFaces[f].faceId + "'");
-                        //rect = data[f].faceRectangle;
-                        //paintFaceRectangle(rect.top, rect.left, rect.width, rect.height, "#fa0202");
                     }
-                    //alert(myData);
                 });
     });
 }
