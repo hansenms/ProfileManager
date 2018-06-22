@@ -33,3 +33,19 @@
         display: none;
     }
 }
+
+/* For image rectangles */
+.wrapper {
+    position:relative;
+}
+
+.box {
+    position:absolute;
+    top:0px;
+    left:0px;
+    width:50px;
+    height:50px;
+    border:2px solid #fa0202;
+    background-color:transparent;
+    visibility: hidden;
+}

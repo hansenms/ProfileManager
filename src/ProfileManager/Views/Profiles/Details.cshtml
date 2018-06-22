@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Details";
+    var imageUrl = "/api/profile/image/" + Model.Photo;
 }
 
 <h2>Details</h2>
@@ -28,15 +29,71 @@
         <dd>
             @Html.DisplayFor(model => model.Department)
         </dd>
+        <!--
         <dt>
             @Html.DisplayNameFor(model => model.Photo)
         </dt>
         <dd>
             @Html.DisplayFor(model => model.Photo)
         </dd>
+        -->
     </dl>
 </div>
+<div>
+    <img id="profile-photo" width="200" src="@imageUrl" />
+</div>
+
+<div>
+    <div class="wrapper" id="image-wrapper">
+        <img id="outImage" width="200" src="" alt="ImageNotFound" />
+        <!--
+        <div id="faceRectangle" class="box"></div>
+        -->
+    </div>
+    <div class="form-group">
+        <form id="image-upload-form" enctype="multipart/form-data">
+            <input style="width: 200px;" class="form-control" type="file" id="file"/>
+        </form>
+    </div>  
+    <div class="alert alert-success" role="alert" id="feedback" style="visibility: hidden;"></div>  
+</div>
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+<script lang="JavaScript">
+    function testLoadImage()
+    {
+        var img = document.getElementById('profile-photo');
+
+        $.ajax({
+            url: img.src,
+            xhr:function(){// Seems like the only way to get access to the xhr object
+                var xhr = new XMLHttpRequest();
+                xhr.responseType= 'blob'
+                return xhr;
+            },
+            type: 'GET',
+            cache: false,
+        })
+        .done(function (imgData) {
+            faceDetectAnalysis(
+                  imgData, 
+                  function (myData) {
+                      alert(myData);
+                  });
+        });
+    }
+
+
+    document.getElementById('file').onchange = loadVerificationProfileImageFromFile;
+
+    //document.getElementById('profile-photo').onload = testLoadImage();
+</script>
+
+}

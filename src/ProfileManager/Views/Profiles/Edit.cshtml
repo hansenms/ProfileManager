@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Edit";
+    var initialImageName = "/api/profile/image/" + Model.Photo;
 }
 
 <h2>Edit</h2>
@@ -13,6 +14,7 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Photo" />
             <div class="form-group">
                 <label asp-for="FirstName" class="control-label"></label>
                 <input asp-for="FirstName" class="form-control" />
@@ -29,21 +31,50 @@
                 <span asp-validation-for="Department" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Photo" class="control-label"></label>
-                <input asp-for="Photo" class="form-control" />
-                <span asp-validation-for="Photo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input id="edit-submit" type="submit" value="Save" class="btn btn-default" />
             </div>
         </form>
     </div>
 </div>
-
+    <div>
+        <div class="wrapper" id="image-wrapper">
+            <img id="outImage" width="200" src="@initialImageName" alt="ImageNotFound" />
+            <!--
+            <div id="faceRectangle" class="box"></div>
+            -->
+        </div>
+        <div class="form-group">
+            <form id="image-upload-form" enctype="multipart/form-data">
+                <input style="width: 200px;" class="form-control" type="file" id="file"/>
+            </form>
+        </div>  
+        <div class="alert alert-success" role="alert" id="feedback" style="visibility: hidden;"></div>  
+    </div>
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <style>
+    .wrapper {
+        position:relative;
+    }
+
+    .box {
+        position:absolute;
+        top:0px;
+        left:0px;
+        width:50px;
+        height:50px;
+        border:2px solid #fa0202;
+        background-color:transparent;
+        visibility: hidden;
+    }
+    </style>
+
+   <script lang="JavaScript">
+        document.getElementById('file').onchange = loadNewProfileImageFromFile;
+   </script>
 }
