@@ -14,7 +14,7 @@ namespace ProfileManager.Controllers
 {
     public class ProfilesController : Controller
     {
-        private HttpClient GetHttpClient()
+        private HttpClient GetHttpClient(string accessToken)
         {
             var client = new HttpClient();
             string protocol = Request.IsHttps ? "https://" : "http://";
@@ -22,8 +22,6 @@ namespace ProfileManager.Controllers
             client.DefaultRequestHeaders.Clear();  
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));  
 
-            //Pass on access token if we have one.
-            string accessToken = Request.Headers["x-ms-token-aad-access-token"];
             if (!String.IsNullOrEmpty(accessToken))
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
@@ -37,7 +35,7 @@ namespace ProfileManager.Controllers
         {
 
             List<Profile> profiles = new List<Profile>();
-            using (var client = GetHttpClient())
+            using (var client = GetHttpClient(Request.Headers["x-ms-token-aad-access-token"]))
             { 
                 HttpResponseMessage response = await client.GetAsync("api/profile");
                 if (response.IsSuccessStatusCode)
@@ -63,7 +61,7 @@ namespace ProfileManager.Controllers
 
             Profile profile;
 
-            using (var client = GetHttpClient())
+            using (var client = GetHttpClient(Request.Headers["x-ms-token-aad-access-token"]))
             { 
                 HttpResponseMessage response = await client.GetAsync("api/profile/" + id.ToString());
                 if (response.IsSuccessStatusCode)
@@ -92,7 +90,7 @@ namespace ProfileManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,Department,Photo")] Profile profile)
         {
-            using (var client = GetHttpClient())
+            using (var client = GetHttpClient(Request.Headers["x-ms-token-aad-access-token"]))
             { 
                 if (ModelState.IsValid)
                 {
@@ -117,7 +115,7 @@ namespace ProfileManager.Controllers
 
             Profile profile;
 
-            using (var client = GetHttpClient())
+            using (var client = GetHttpClient(Request.Headers["x-ms-token-aad-access-token"]))
             { 
                 HttpResponseMessage response = await client.GetAsync("api/profile/" + id.ToString());
                 if (response.IsSuccessStatusCode)
@@ -146,7 +144,7 @@ namespace ProfileManager.Controllers
 
             if (ModelState.IsValid)
             {
-                using (var client = GetHttpClient())
+                using (var client = GetHttpClient(Request.Headers["x-ms-token-aad-access-token"]))
                 { 
                     HttpResponseMessage response = await client.PutAsJsonAsync("api/profile/" + id.ToString(), profile);
                     if (!response.IsSuccessStatusCode)
@@ -170,7 +168,7 @@ namespace ProfileManager.Controllers
 
             Profile profile;
 
-            using (var client = GetHttpClient())
+            using (var client = GetHttpClient(Request.Headers["x-ms-token-aad-access-token"]))
             { 
                 HttpResponseMessage response = await client.GetAsync("api/profile/" + id.ToString());
                 if (response.IsSuccessStatusCode)
@@ -191,7 +189,7 @@ namespace ProfileManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            using (var client = GetHttpClient())
+            using (var client = GetHttpClient(Request.Headers["x-ms-token-aad-access-token"]))
             { 
                 HttpResponseMessage response = await client.DeleteAsync("api/profile/" + id.ToString());
                 if (!response.IsSuccessStatusCode)
