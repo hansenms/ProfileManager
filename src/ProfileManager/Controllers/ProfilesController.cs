@@ -44,8 +44,7 @@ namespace ProfileManager.Controllers
                 }
                 else
                 {
-                    return Ok(Request.Headers["x-ms-token-aad-access-token"]);
-                    //return NotFound();
+                    return NotFound();
                 }
 
             }
