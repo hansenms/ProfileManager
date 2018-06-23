@@ -5,11 +5,26 @@
 <div>
     <h1>Profile Manager</h1> 
 
-    <div>
+    <div style="margin: 10px;">
         This example <em>Profile Manager</em> application uses Azure managed services such as App Service, Azure SQL, Azure Storage, and Cognitive Services. It consists of a backend API, which services HTTP(S) requests from a front-end web application. In this example, both the web application and backend API are hosted in the same Azure Web App service for convenience, but they could be hosted separately. The backend API could also serve other clients such as a mobile application.
     </div>
 
-    <div align="center" style="margin: 0.5cm;">
+    <div align="center" style="margin: 10px;">
         <img width="512" src="images/profile-manager-app.png" />
+    </div>
+
+    <div style="margin: 10px;">
+        The backend API forwards all client requests to datbase, storage, and cognitive services. Consequently, no API keys or secrets need to be shared with the client. Access to the backend API can be secure with OAuth authentication/authorization. You can browse the <a href="/swagger">Swagger Documentation </a> for the Profile Manager API.
+    </div>
+
+    <h2>Instructions</h2>
+
+    <div style="margin: 10px;"><p>To use the profile manager click <a href="/Profiles">Profiles</a> in the menu.</p></div>
+    <div style="margin: 10px;">
+        <ol>
+            <li>Create new profiles with the <a href="/Profiles/Create">Create New</a> link.</li>
+            <li>To add a photo to a profile, use the edit link next to each profile.</li>
+            <li>To validate a test photo againt a profile photo, use the Details link.</li>
+        </ol>
     </div>
 </div>
