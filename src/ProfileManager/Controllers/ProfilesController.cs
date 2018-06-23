@@ -22,6 +22,13 @@ namespace ProfileManager.Controllers
             client.DefaultRequestHeaders.Clear();  
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));  
 
+            //Pass on access token if we have one.
+            string accessToken = Request.Headers["x-ms-token-aad-access-token"];
+            if (!String.IsNullOrEmpty(accessToken))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            }
+
             return client;
         }
 
