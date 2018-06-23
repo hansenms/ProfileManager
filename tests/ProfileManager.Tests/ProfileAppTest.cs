@@ -23,6 +23,7 @@ namespace ProfileManager.Tests
 
         public ProfileAppTest(CustomWebApplicationFactory<ProfileManager.Startup> factory)
         {
+
             _client = factory.CreateClient(new WebApplicationFactoryClientOptions
                 {
                     AllowAutoRedirect = false
@@ -32,6 +33,7 @@ namespace ProfileManager.Tests
 
         [Theory]
         [InlineData("/")]
+        [InlineData("/Home/About")]
         public async Task Get_EndpointsReturnSuccessAndCorrectContentType(string url)
         {
             // Arrange
